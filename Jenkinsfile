@@ -21,8 +21,8 @@ node('docker-centos7-puppet') {
     }
 
     stage 'Running unit tests'
-    sh 'bundle exec rake validate lint'
-    sh '[[ ${env.JOBNAME} == ing-* ]] && bundle exec rake spec'
+    sh "bundle exec rake validate lint"
+    sh "[[ ${env.JOBNAME} == ing-* ]] && bundle exec rake spec"
 
     stage 'Getting new version variable'
     sh 'jq \'(.version)\' metadata.json | sed -e \'s/^"//\'  -e \'s/"$//\' > .version '
