@@ -26,7 +26,7 @@ node('docker-centos7-puppet') {
 
     stage 'Getting new version variable'
     sh 'jq \'(.version)\' metadata.json | sed -e \'s/^"//\'  -e \'s/"$//\' > .version '
-    sh 'BNUMBER=$(git tag | { egrep -v -i [a-z] || true ; } | sort -V | awk -F- \'{print $2} END { if (NR==0) print "0"}\' | tail -1) ;  ((BNUMBER++)) ; echo $BNUMBER > .bnumber'
+    sh 'BNUMBER=$(git tag | { egrep -v -i [a-z] || true ; } | sort -V | awk -F- \'{print $2} END { if (NR==0) print "0"}\' | tail -1) ;  ((BNUMBER++)) || true ; echo $BNUMBER > .bnumber'
     sh 'VERSION=$(cat .version) ; BNUMBER=$(cat .bnumber) ; NEWVERSION=$(echo ${VERSION}-${BNUMBER}) ; echo $NEWVERSION > .newversion'
     def NEWVERSION = readFile('.newversion').trim()
     env.NEWVERSION = NEWVERSION
