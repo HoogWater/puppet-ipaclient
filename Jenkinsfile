@@ -1,6 +1,6 @@
 node('docker-centos7-puppet') {
     checkout scm
-    
+
     stage 'Getting module name from JOB_NAME'
     sh 'echo ${JOB_NAME##*/} > .jobname'
     def JOBNAME = readFile('.jobname').trim()
@@ -21,8 +21,8 @@ node('docker-centos7-puppet') {
     }
 
     stage 'Running unit tests'
-    sh "bundle exec rake validate lint"
-    sh "[[ ${env.JOBNAME} == ing-roles || ${env.JOBNAME} == ing-component* ]] && bundle exec rake spec || true"
+    sh 'bundle exec rake validate lint spec strings:generate'
+    publishHTML(target: [allowMissing: false, alwaysLinkToLastBuild: true, keepAll: false, reportDir: 'doc', reportFiles: 'index.html', reportName: 'module docs'])
 
     stage 'Getting new version variable'
     sh 'jq \'(.version)\' metadata.json | sed -e \'s/^"//\'  -e \'s/"$//\' > .version '
@@ -31,7 +31,7 @@ node('docker-centos7-puppet') {
     def NEWVERSION = readFile('.newversion').trim()
     env.NEWVERSION = NEWVERSION
     echo "New version will be $NEWVERSION"
-    
+
     stage 'Tagging source repo with new version tag'
     withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: '2215c2a6-0dca-44ae-8cf8-8f89747c630e', usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD']]) {
         sh 'git config --global user.email "Jenkins@build.paas.intranet" ; \
@@ -46,4 +46,3 @@ node('docker-centos7-puppet') {
     echo "NEWVERSION = $NEWVERSION"
     build job: 'Workflow/task-update-module-version-in-ing-puppet-control', parameters: [[$class: 'StringParameterValue', name: 'NEWVERSION', value: NEWVERSION], [$class: 'StringParameterValue', name: 'GIT_URL', value: GIT_URL], [$class: 'StringParameterValue', name: 'MODULE_NAME', value: JOBNAME]]
 }
-

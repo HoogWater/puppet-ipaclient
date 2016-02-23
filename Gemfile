@@ -11,7 +11,9 @@ group :test do
 end
 
 group :development do
-  gem 'guard-rake',  :require => false
+  gem 'guard-rake',      :require => false
+  gem 'puppet-strings',  :require => false
+  gem 'redcarpet',       :require => false
 end
 
 
