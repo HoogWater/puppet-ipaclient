@@ -140,7 +140,7 @@ class ipaclient (
         $opt_realm = ''
       }
 
-      if $principal {
+      if $principal != '' {
         $opt_principal = ['--principal', "${principal}@${realm}"]
       } else {
         $opt_principal = ''
